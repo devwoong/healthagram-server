@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"io"
 	"log"
 	"net"
@@ -9,13 +10,21 @@ import (
 	"text/template"
 
 	"github.com/gorilla/mux"
+	"gopkg.in/mgo.v2"
 )
+
+type test_s struct {
+	id    string
+	os    string
+	phone string
+}
 
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/test", testHTTP).Methods("GET")
 	r.HandleFunc("/Html", htmlTestHTTP).Methods("GET")
 	r.HandleFunc("/upload", imageGetterHTTP).Methods("POST")
+	r.HandleFunc("/json", jsonGetterHTTP).Methods("POST")
 	//	server := &http.Server{
 	//		Handler: r,
 	//		Addr:    "localhost:8000",
@@ -44,23 +53,6 @@ func htmlTestHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func imageGetterHTTP(w http.ResponseWriter, r *http.Request) {
-
-	// r.ParseMultipartForm(32 << 20)
-	// file, handler, err := r.FormFile("uplTheFile")
-	// if err != nil {
-	// 	log.Print("Handler or file error : " + err.Error())
-	// 	return
-	// }
-	// defer file.Close()
-	// fmt.Fprintf(w, "%v", handler.Header)
-	// f, err := os.OpenFile("./image/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
-	// if err != nil {
-	// 	log.Print("save file error : " + err.Error())
-	// 	return
-	// }
-	// defer f.Close()
-	// io.Copy(f, file)
-
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Print(err)
@@ -84,5 +76,33 @@ func imageGetterHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+	}
+
+}
+func jsonGetterHTTP(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var jsonContent test_s
+	var jsondata map[string]string
+	err := decoder.Decode(&jsondata)
+	if err != nil {
+		log.Print(err)
+	}
+
+	for k, v := range jsondata {
+		log.Print(k + " : " + v)
+	}
+	defer r.Body.Close()
+	log.Print(jsonContent.id)
+
+	session, err := mgo.Dial("localhost:27017")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("healthagram").C("bulletins")
+	err = c.Insert(jsondata)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
