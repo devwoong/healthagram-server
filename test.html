@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            table {
+                
+                align: center;
+            }
+            table, th, td {
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                border-right: none;
+                border-left: none;
+                border-collapse: collapse;
+            }
+            th {
+                background-color: #e4e4e4;
+            }
+            td {
+                padding: 5px;
+                text-align: left;    
+                border-bottom: 0.5px dotted;
+                border-top: 0.5px dotted;
+            }
+            #p01 {
+                font: caption;
+                text-align: center;
+            }
+            caption {
+                font: bold;
+            }
+        </style>
+    </head>
+    <body>
+    
+    <h2>Cell that spans two columns:</h2>
+    <p id="p01">hello</p>
+    <table style="width:80%">
+        
+      <tr>
+        <th rowspan="2" style="text-align:center">Name</th>
+        <th colspan="2">Telephone</th>
+      </tr>
+      <tr>
+        <th>55577854</th>
+        <th>55577855</th>
+      </tr>
+      <tr>
+          <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+          <td>woong</td>
+        <td>111</td>
+        <td>0101</td>
+      </tr>
+    </table>
+</br>
+
+
+    </body>
+</html>
